@@ -1,0 +1,7 @@
+FROM debian:busterd
+
+RUN apt-get update -y && apt-get install mariadb-server -y
+
+RUN ./bash_script.sh
+
+CMD [/usr/bin/mysqld_safe]
