@@ -8,7 +8,8 @@ RUN mariadb-install-db --user=mysql --datadir=/var/lib/mysql --skip-test-db
 
 EXPOSE 3306
 
-COPY conf/create_db.sh /config.sh
+COPY ./requirements/mariadb/conf/create_db.sh /config.sh
+
 RUN chmod +x /config.sh
 
 ENTRYPOINT ["sh", "/config.sh"]

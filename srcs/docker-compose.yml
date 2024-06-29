@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  mariadb:
+    build:
+      context: .
+      dockerfile: requirements/mariadb/Dockerfile
+    container_name: mariadb
+    env_file: .env
+    ports:
+      - "3306:3306"
+    restart: always
+
   nginx:
     build:
       context: .
@@ -14,12 +24,4 @@ services:
       - /home/${USER}/simple_docker_nginx_html/public/html:/var/www/
     restart: always
 
-  mariadb:
-    build:
-      context: .
-      dockerfile: requirements/mariadb/Dockerfile
-    container_name: mariadb
-    env_file: .env
-    ports:
-      -"3306:3306"
-    restart: always
+
