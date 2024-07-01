@@ -1,27 +1,50 @@
 version: '3'
 
 services:
-  mariadb:
-    build:
-      context: .
-      dockerfile: requirements/mariadb/Dockerfile
-    container_name: mariadb
-    env_file: .env
-    ports:
-      - "3306:3306"
-    restart: always
 
   nginx:
     build:
       context: .
       dockerfile: requirements/nginx/Dockerfile
     container_name: nginx
-    #depends_on:
-      # - wordpress
+    depends_on:
+      - wordpress
     ports:
       - "443:443"
     volumes:
       - /home/${USER}/simple_docker_nginx_html/public/html:/var/www/
+    networks:
+      - my_network
     restart: always
 
+  mariadb:
+    build:
+      context: .
+      dockerfile: requirements/mariadb/Dockerfile
+    env_file: .env
+    container_name: mariadb
+    ports:
+      - "3306:3306"
+    networks:
+      - my_network
+    restart: always
 
+  wordpress:
+    build:
+      context: .
+      dockerfile: requirements/wordpress/Dockerfile
+    env_file: .env
+    container_name: wordpress
+    depends_on:
+      - mariadb
+    restart: always
+    volumes: 
+      - /home/${USER}/simple_docker_nginx_html/public/html:/var/www/
+      # - wp-volume:/var/www/
+    networks:
+      - my_network
+
+
+networks:
+  my_network:
+    driver: bridge
