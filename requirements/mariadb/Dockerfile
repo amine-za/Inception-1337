@@ -1,17 +1,17 @@
-FROM alpine:3.18
+FROM debian:bookworm
 
-RUN apk update && apk add --no-cache mariadb mariadb-client && \
-    mkdir -p /run/mysqld && chmod 777 /run/mysqld && \
-    sed -i "s|skip-networking|#skip-networking|g" /etc/my.cnf.d/mariadb-server.cnf
+RUN apt-get update && apt-get install -y mariadb-server
 
-RUN mariadb-install-db --user=mysql --datadir=/var/lib/mysql --skip-test-db
+RUN mkdir -p /run/mysqld && chmod 777 /run/mysqld
 
-EXPOSE 3306
+RUN mkdir -p /home/data && mkdir -p /home/data/tools && mkdir -p /home/data/database
 
-COPY conf/create_db.sh .
+COPY conf/create_db.sh /
 
 RUN chmod +x create_db.sh
 
-ENTRYPOINT ["sh", "create_db.sh"]
+EXPOSE 3306
 
-CMD ["mysqld", "--user=mysql", "--bind-address=0.0.0.0"]
+ENTRYPOINT ["sh", "/create_db.sh"]
+
+CMD ["mariadbd", "--user=root", "--bind-address=0.0.0.0"]

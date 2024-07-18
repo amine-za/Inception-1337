@@ -1,24 +1,22 @@
-name = simple_nginx_html
+name = Inception
 
+# /home/login/data
 all:
-	mkdir -p ~/goinfre/mariadb
-	mkdir -p ~/goinfre/wordpress
-	chmod 777 ~/goinfre/mariadb ~/goinfre/wordpress
-	@printf "Launch configuration ${name}...\n"
-	docker-compose up --build
-
-build:
-	@printf "Building configuration ${name}...\n"
+	mkdir -m 777 -p /home/azaghlou/data/wordpress
+	mkdir -m 777 -p  /home/azaghlou/data/mariadb
 	@docker-compose up --build
+
+# build:
+# 	@printf "Building configuration ${name}...\n"
+# 	@docker-compose up --build
 
 down:
 	@printf "Stopping configuration ${name}...\n"
 	@docker-compose down
-	docker rmi $$(docker images -aq)
-	sudo rm -rf ~/goinfre/mariadb
-	sudo rm -rf ~/goinfre/wordpress
+	@docker volume rm $$(docker volume ls -q)
+	sudo rm -rf /home/azaghlou/data/wordpress /home/azaghlou/data/mariadb
 
-re: fclean all
+re: down all
 
 clean: down
 	@printf "Cleaning configuration ${name}...\n"

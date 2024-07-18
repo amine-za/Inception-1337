@@ -12,7 +12,7 @@ services:
     ports:
       - "443:443"
     volumes:
-      - ~/goinfre/wordpress:/var/www/html
+      - wordpressV:/var/www/html
       # - /home/${USER}/simple_docker_nginx_html/public/html:/var/www/
     networks:
       - my_network
@@ -27,7 +27,7 @@ services:
     networks:
       - my_network
     volumes:
-      - ~/goinfre/mariadb:/var/lib/mysql
+      - mariadbV:/var/lib/mysql
     # restart: on-failure
 
   wordpress:
@@ -40,7 +40,7 @@ services:
       - mariadb
     # restart: on-failure
     volumes: 
-      - ~/goinfre/wordpress:/var/www/html
+      - wordpressV:/var/www/html
       
       # - requirements/wordpress/conf/wp-config-create.sh:/var/www/
     networks:
@@ -55,9 +55,9 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ~/goinfre/wordpress
+      device: /home/azaghlou/data/wordpress
   mariadbV:
     driver_opts:
       type: none
       o: bind
-      device: ~/goinfre/mariadb
+      device: /home/azaghlou/data/mariadb
