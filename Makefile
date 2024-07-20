@@ -1,42 +1,44 @@
 name = Inception
+DockerComposePath = srcs/docker-compose.yml
 
-# /home/login/data
-all:
-	mkdir -m 777 -p /home/azaghlou/data/wordpress
-	mkdir -m 777 -p  /home/azaghlou/data/mariadb
-	@docker-compose up --build
+all: sudo
+	mkdir -m 777 -p /home/azaghlou/data/wordpress 
+	mkdir -m 777 -p /home/azaghlou/data/mariadb
+	@docker-compose -f $(DockerComposePath) up --build -d
 
-# build:
-# 	@printf "Building configuration ${name}...\n"
-# 	@docker-compose up --build
+sudo : 
+	@sudo -v
 
-down:
-	@printf "Stopping configuration ${name}...\n"
-	@docker-compose down
-	@docker volume rm $$(docker volume ls -q)
-	sudo rm -rf /home/azaghlou/data/wordpress /home/azaghlou/data/mariadb
+down: sudo
+	@if [ -z $$(docker network ls -qf "name=srcs_my_network") ]; then \
+		docker-compose -f $(DockerComposePath) down; \
+	else \
+		echo "no network"; \
+	fi
+	@if [ -z $$(docker volume ls -q) ]; then \
+		docker volume rm $$(docker volume ls -q); \
+	else \
+		echo "no volume in there !"; \
+	fi
+	@sudo rm -rf /home/azaghlou/data
+
+
+
 
 re: down all
 
-clean: down
-	@printf "Cleaning configuration ${name}...\n"
-	@docker system prune -a
+stop: sudo 
+	@docker-compose -f $(DockerComposePath) stop
 
-stop:
-	docker stop $$(docker ps -aq)
+clean: sudo
+	@docker-compose -f $(DockerComposePath) down --rmi all
 
-clean_cn:
-	docker rm $$(docker ps -aq)
-	
-clean_im:
-	docker rmi $$(docker images -aq)
-
-fclean:
-	@printf "Total clean of all configurations docker\n"
-	docker stop $$(docker ps -aq)
-	docker system prune --all --force
-
-# @docker network prune --force
-# @docker volume prune --force
-
-.PHONY : all build down re clean fclean
+fclean: sudo
+	@if ! [ -z $(shell docker ps -aq)]; \
+		then @printf "Total clean of all configurations docker\n"; \
+	 	docker stop $(shell docker ps -aq); \
+		sudo rm -rf /home/azaghlou/data \
+	else \
+		echo "nothing to be cleaned !"; \
+	fi
+	@docker system prune --all --force
