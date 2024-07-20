@@ -2,10 +2,11 @@ FROM debian:bookworm
 
 RUN apt-get update && apt-get upgrade
 
-RUN  apt-get install aptitude -y && \
-    apt-get install php8.2 php8.2-cli php8.2-mysql curl php8.2-fpm unzip mariadb-client -y && \
+RUN apt-get install -y php8.2 php8.2-cli php8.2-mysql curl php8.2-fpm mariadb-client -y && \
     sed -i 's|listen = /run/php/php8.2-fpm.sock|listen = 0.0.0.0:9000|g' /etc/php/8.2/fpm/pool.d/www.conf
 
+
+# Installing WP command line interface
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
     chmod +x wp-cli.phar && \
     mv wp-cli.phar /usr/local/bin/wp

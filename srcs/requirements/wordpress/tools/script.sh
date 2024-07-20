@@ -9,7 +9,7 @@ if [ ! -f /var/www/html/wp-config.php ]; then
 
     chmod 600 /var/www/html/wp-config.php
 
-    wp core install --allow-root --url=ylabrahm.42.fr --title=YoueMe --admin_user=root --admin_password=$ROOT_PASS --admin_email=$EMAIL_ROOT
+    wp core install --allow-root --url=$URL --title=$TITLE --admin_user=$ADMIN --admin_password=$ROOT_PASS --admin_email=$EMAIL_ROOT
 
     chown -R www-data:www-data /var/www/html/
     chmod -R 777 /var/www/html/
@@ -17,7 +17,5 @@ if [ ! -f /var/www/html/wp-config.php ]; then
     wp user create --allow-root root $EMAIL_ROOT --role=administrator --user_pass=$ROOT_PASS --path=/var/www/html/wordpress
     wp user create --allow-root $USER_NAME $EMAIL --role=editor --user_pass=$DB_PASS --path=/var/www/html/wordpress
 fi
-
-sleep 1
 
 exec "$@"
