@@ -5,8 +5,10 @@ services:
       dockerfile: Dockerfile
     container_name: nginx
     image: nginx
+    env_file: .env
     depends_on:
-      - wordpress
+      wordpress:
+        condition: service_healthy
     ports:
       - "443:443"
     volumes:
@@ -14,6 +16,12 @@ services:
     networks:
       - my_network
     restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-check-certificate --spider -q https://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   mariadb:
     build:
@@ -27,6 +35,12 @@ services:
     volumes:
       - mariadbV:/var/lib/mysql
     restart: on-failure
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   wordpress:
     build:
@@ -36,12 +50,19 @@ services:
     container_name: wordpress
     image: wordpress
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     restart: on-failure
     volumes: 
       - wordpressV:/var/www/html
     networks:
       - my_network
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep -q '[p]hp-fpm' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 networks:
   my_network:
@@ -49,12 +70,14 @@ networks:
 
 volumes:
   wordpressV:
+    driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/azaghlou/data/wordpress
+      device: ./data/wordpress
   mariadbV:
+    driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/azaghlou/data/mariadb
+      device: ./data/mariadb

@@ -1,4 +1,4 @@
-# !bin/sh
+#!/bin/sh
 
 echo "FLUSH PRIVILEGES;
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${ROOT_PASS}';

@@ -1,35 +1,38 @@
 name = Inception
-DockerComposePath = srcs/docker-compose.yml
+DockerComposePath = docker-compose.yml
 
-all: sudo
-	mkdir -m 777 -p /home/azaghlou/data/wordpress 
-	mkdir -m 777 -p /home/azaghlou/data/mariadb
+all: help
+
+help:
+	@echo "Usage: make [target]"
+	@echo "Targets:"
+	@echo "  up       - Build and start the containers"
+	@echo "  down     - Stop and remove the containers and volumes"
+	@echo "  re       - Restart the containers"
+	@echo "  stop     - Stop the containers"
+	@echo "  status   - Show the status of the containers"
+	@echo "  clean    - Remove containers and images"
+	@echo "  fclean   - Remove all unused Docker data"
+
+up:
+	@mkdir -p $(PWD)/data/wordpress
+	@mkdir -p $(PWD)/data/mariadb
 	@docker compose -f $(DockerComposePath) up --build -d
 
-sudo : 
-	@sudo -v
+down:
+	@docker compose -f $(DockerComposePath) down -v 2>/dev/null || true
 
-down: sudo
-	@if ! [ -z $$(docker network ls -qf "name=srcs_my_network") ]; then \
-		docker compose -f $(DockerComposePath) down; \
-	else \
-		echo "no network"; \
-	fi
-	@if ! [ -z $$(docker volume ls -qf "name=srcs_mariadbV") ]; then \
-		docker volume rm $$(docker volume ls -q); \
-	else \
-		echo "no volume in there !"; \
-	fi
-	@sudo rm -rf /home/azaghlou/data
+re: down up
 
-
-re: down all
-
-stop: sudo 
+stop:
 	@docker compose -f $(DockerComposePath) stop
 
-clean: sudo
+status:
+	@docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
+
+clean:
 	@docker compose -f $(DockerComposePath) down --rmi all
 
-fclean: sudo down
+fclean: down
 	@docker system prune --all --force
+	@docker run --rm -v $(PWD)/data:/data alpine:3.16 sh -c "rm -rf /data/wordpress /data/mariadb" 2>/dev/null || true
