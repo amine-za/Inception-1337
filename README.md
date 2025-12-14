@@ -1,16 +1,47 @@
-# Inception Project
 
-This project sets up a simple web server environment using Docker and Docker Compose. It includes Nginx, MariaDB, and WordPress, each running in its own container.
+# Inception - Dockerized Microservices Architecture
 
-## Screenshots
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=flat&logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white)
+![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=flat&logo=mariadb&logoColor=white)
+![WordPress](https://img.shields.io/badge/WordPress-21759B?style=flat&logo=wordpress&logoColor=white)
+
+
+**Inception** is a system administration project that deploys a fully functional LEMP stack (Linux, Nginx, MariaDB, PHP-FPM) using **Docker containers**. The architecture emphasizes security, modularity, and data persistence through strict volume management and custom Docker networks.
+
+## System Architecture & Deployment
 <p align="center">
-    <img src="images\Inception_Architecture_Diagram.png" width="32%" alt="Running Project in terminal" />
-    <img src="images/Containers_status.jpg" width="32%" 
-    alt="Booking flow" />
-    <img src="images/configured_domain_with_https.jpg" width="32%" alt="Deployment Diagram" />
+    <img src="images/Inception_Architecture_Diagram.png" width="32%" alt="Architecture Diagram" />
+    <img src="images/Containers_status.jpg" width="32%" alt="Docker Containers Status" />
+    <img src="images/configured_domain_with_https.jpg" width="32%" alt="Secure HTTPS Connection" />
 </p>
 
-## Quick Start
+## Technical Architecture
+
+This project does not use pre-made images. All containers are built from **Alpine Linux** (for minimal footprint) using custom Dockerfiles.
+
+1.  **Nginx (Reverse Proxy):**
+    - Configured as the only entry point (Port 443).
+    - Handles **TLS/SSL encryption** (self-signed) to ensure secure communication.
+    - Forwards PHP requests to the WordPress container via FastCGI.
+
+2.  **MariaDB (Database):**
+    - Isolated in a private subnet (not exposed to the host).
+    - Persistent storage via Docker Volumes ensures data survives container restarts.
+
+3.  **WordPress + PHP-FPM:**
+    - Serves dynamic content.
+    - Communicates with MariaDB over a dedicated internal Docker network.
+
+## Deployment Instructions
+
+**Prerequisites**
+
+    Docker & Docker Compose
+    Make (for automation)
+
 
 1. **Clone the repository**
    ```bash
